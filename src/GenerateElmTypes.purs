@@ -76,6 +76,18 @@ instance epZZZ :: -- overlapping instance because i am a madman
   ) => ExtractName a where
   extractName _ = reflectSymbol (SProxy :: SProxy name)
 
+-- this would work fine too, but it's less fun:
+-- instance epCoords :: ExtractName Coords where
+--   extractName _ = genericExtractConstructorName (Proxy :: Proxy Coords)
+
+-- genericExtractConstructorName :: forall a rep name b
+--   . Generic a rep
+--   => TypeEquals rep (Constructor name b)
+--   => IsSymbol name
+--   => Proxy a
+--   -> String
+-- genericExtractConstructorName _ = reflectSymbol (SProxy :: SProxy name)
+
 prepareContents :: String -> String
 prepareContents contents = "module EtchSketch.Types exposing (..)\n\n" <> contents
 

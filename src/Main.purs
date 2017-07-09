@@ -133,8 +133,6 @@ data Query a
   | ClearScreen Unit (H.SubscribeStatus -> a)
   | UpdateElm a
 
-data Message = ElmInstanceInitialized ElmInstance
-
 type AppEffects eff =
   ( console :: CONSOLE
   , dom :: DOM
@@ -145,7 +143,7 @@ type AppEffects eff =
 
 type AppAff eff = Aff (AppEffects eff)
 
-ui :: forall eff. H.Component HH.HTML Query Unit Message (AppAff eff)
+ui :: forall eff. H.Component HH.HTML Query Unit Void (AppAff eff)
 ui =
   H.lifecycleComponent
     { initialState: const initialState
@@ -176,7 +174,7 @@ ui =
         ]
         []
 
-    eval :: Query ~> H.ComponentDSL State Query Message (AppAff eff)
+    eval :: Query ~> H.ComponentDSL State Query Void (AppAff eff)
     eval (Init next) = do
       root <- H.getHTMLElementRef rootLabel
       case root of

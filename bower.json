@@ -12,7 +12,8 @@
     "purescript-halogen": "^2.1.0",
     "purescript-behaviors": "^5.1.0",
     "purescript-generics-rep": "^5.1.0",
-    "purescript-profunctor-lenses": "^3.2.0"
+    "purescript-profunctor-lenses": "^3.2.0",
+    "purescript-node-fs-aff": "^4.0.0"
   },
   "devDependencies": {
     "purescript-psci-support": "^3.0.0"

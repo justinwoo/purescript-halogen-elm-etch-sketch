@@ -5,26 +5,16 @@ import Html.Attributes exposing (style)
 import Html.Events exposing (onClick)
 import Svg exposing (svg, rect)
 import Svg.Attributes as SvgAttrs
+import EtchSketch.Types exposing (..)
 
 port clearScreen : () -> Cmd msg
-port modelUpdates : (Model -> msg) -> Sub msg
-
-type alias Coords
-  = { x : Int, y : Int}
-
-type alias Model =
-  { cursor : Coords
-  , points : List Coords
-  , width : Int
-  , height : Int
-  , increment : Int
-  }
+port modelUpdates : (ElmModel -> msg) -> Sub msg
 
 type Msg
-  = UpdateModel Model
+  = UpdateModel ElmModel
   | ClearScreen
 
-init : Model
+init : ElmModel
 init =
   { cursor = Coords 0 0
   , points = []
@@ -33,7 +23,7 @@ init =
   , increment = 10
   }
 
-update : Msg -> Model -> (Model, Cmd Msg)
+update : Msg -> ElmModel -> (ElmModel, Cmd Msg)
 update msg model =
   case msg of
     UpdateModel newModel ->
@@ -51,7 +41,7 @@ point increment subkey {x, y} =
     ]
     []
 
-view : Model -> Html Msg
+view : ElmModel -> Html Msg
 view model =
   let
     newPoint =
@@ -83,7 +73,7 @@ view model =
           ]
       ]
 
-main : Program Never Model Msg
+main : Program Never ElmModel Msg
 main =
   Html.program
     { init = ( init, Cmd.none )

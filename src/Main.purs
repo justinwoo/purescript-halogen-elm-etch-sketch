@@ -55,6 +55,9 @@ instance isElmPortSafeField ::
   ) => IsElmPortSafe (Field name inner)
 instance isElmPortSafeInt ::
   IsElmPortSafe Int
+instance isElmPortSafeArray ::
+  ( IsElmPortSafe inner
+  ) =>  IsElmPortSafe (Array inner)
 instance isElmPortSafeSum ::
   ( Fail "Sums do not work in ports"
   ) => IsElmPortSafe (Sum a b)
@@ -84,7 +87,6 @@ newtype Coords = Coords
   }
 derive instance genericCoords :: Generic Coords _
 instance isElmPortSafeCoords :: IsElmPortSafe Coords
-instance isElmPortSafeArrayCoords :: IsElmPortSafe (Array Coords)
 derive instance eqCoords :: Eq Coords
 derive instance ordCoords :: Ord Coords
 

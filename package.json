@@ -7,9 +7,10 @@
     "test": "test"
   },
   "scripts": {
-    "build": "npm run build:elm && npm run build:ps",
+    "build": "npm run build:generate && npm run build:elm && npm run build:ps",
     "build:elm": "elm-make src/EtchSketch.elm --output dist/elm.js",
     "build:ps": "pulp browserify -O --to dist/index.js",
+    "build:generate": "pulp run -m GenerateElmTypes",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",

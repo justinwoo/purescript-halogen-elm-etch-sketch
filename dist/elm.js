@@ -8601,6 +8601,15 @@ var _elm_lang$svg$Svg_Attributes$accumulate = _elm_lang$virtual_dom$VirtualDom$a
 var _elm_lang$svg$Svg_Attributes$accelerate = _elm_lang$virtual_dom$VirtualDom$attribute('accelerate');
 var _elm_lang$svg$Svg_Attributes$accentHeight = _elm_lang$virtual_dom$VirtualDom$attribute('accent-height');
 
+var _user$project$EtchSketch_Types$Coords = F2(
+	function (a, b) {
+		return {x: a, y: b};
+	});
+var _user$project$EtchSketch_Types$ElmModel = F5(
+	function (a, b, c, d, e) {
+		return {cursor: a, height: b, increment: c, points: d, width: e};
+	});
+
 var _user$project$Main$point = F3(
 	function (increment, subkey, _p0) {
 		var _p1 = _p0;
@@ -8629,6 +8638,13 @@ var _user$project$Main$point = F3(
 			},
 			{ctor: '[]'});
 	});
+var _user$project$Main$init = {
+	cursor: A2(_user$project$EtchSketch_Types$Coords, 0, 0),
+	points: {ctor: '[]'},
+	width: 800,
+	height: 600,
+	increment: 10
+};
 var _user$project$Main$clearScreen = _elm_lang$core$Native_Platform.outgoingPort(
 	'clearScreen',
 	function (v) {
@@ -8655,41 +8671,41 @@ var _user$project$Main$modelUpdates = _elm_lang$core$Native_Platform.incomingPor
 		function (cursor) {
 			return A2(
 				_elm_lang$core$Json_Decode$andThen,
-				function (points) {
+				function (height) {
 					return A2(
 						_elm_lang$core$Json_Decode$andThen,
-						function (width) {
+						function (increment) {
 							return A2(
 								_elm_lang$core$Json_Decode$andThen,
-								function (height) {
+								function (points) {
 									return A2(
 										_elm_lang$core$Json_Decode$andThen,
-										function (increment) {
+										function (width) {
 											return _elm_lang$core$Json_Decode$succeed(
-												{cursor: cursor, points: points, width: width, height: height, increment: increment});
+												{cursor: cursor, height: height, increment: increment, points: points, width: width});
 										},
-										A2(_elm_lang$core$Json_Decode$field, 'increment', _elm_lang$core$Json_Decode$int));
+										A2(_elm_lang$core$Json_Decode$field, 'width', _elm_lang$core$Json_Decode$int));
 								},
-								A2(_elm_lang$core$Json_Decode$field, 'height', _elm_lang$core$Json_Decode$int));
+								A2(
+									_elm_lang$core$Json_Decode$field,
+									'points',
+									_elm_lang$core$Json_Decode$list(
+										A2(
+											_elm_lang$core$Json_Decode$andThen,
+											function (x) {
+												return A2(
+													_elm_lang$core$Json_Decode$andThen,
+													function (y) {
+														return _elm_lang$core$Json_Decode$succeed(
+															{x: x, y: y});
+													},
+													A2(_elm_lang$core$Json_Decode$field, 'y', _elm_lang$core$Json_Decode$int));
+											},
+											A2(_elm_lang$core$Json_Decode$field, 'x', _elm_lang$core$Json_Decode$int)))));
 						},
-						A2(_elm_lang$core$Json_Decode$field, 'width', _elm_lang$core$Json_Decode$int));
+						A2(_elm_lang$core$Json_Decode$field, 'increment', _elm_lang$core$Json_Decode$int));
 				},
-				A2(
-					_elm_lang$core$Json_Decode$field,
-					'points',
-					_elm_lang$core$Json_Decode$list(
-						A2(
-							_elm_lang$core$Json_Decode$andThen,
-							function (x) {
-								return A2(
-									_elm_lang$core$Json_Decode$andThen,
-									function (y) {
-										return _elm_lang$core$Json_Decode$succeed(
-											{x: x, y: y});
-									},
-									A2(_elm_lang$core$Json_Decode$field, 'y', _elm_lang$core$Json_Decode$int));
-							},
-							A2(_elm_lang$core$Json_Decode$field, 'x', _elm_lang$core$Json_Decode$int)))));
+				A2(_elm_lang$core$Json_Decode$field, 'height', _elm_lang$core$Json_Decode$int));
 		},
 		A2(
 			_elm_lang$core$Json_Decode$field,
@@ -8706,21 +8722,6 @@ var _user$project$Main$modelUpdates = _elm_lang$core$Native_Platform.incomingPor
 						A2(_elm_lang$core$Json_Decode$field, 'y', _elm_lang$core$Json_Decode$int));
 				},
 				A2(_elm_lang$core$Json_Decode$field, 'x', _elm_lang$core$Json_Decode$int)))));
-var _user$project$Main$Coords = F2(
-	function (a, b) {
-		return {x: a, y: b};
-	});
-var _user$project$Main$init = {
-	cursor: A2(_user$project$Main$Coords, 0, 0),
-	points: {ctor: '[]'},
-	width: 800,
-	height: 600,
-	increment: 10
-};
-var _user$project$Main$Model = F5(
-	function (a, b, c, d, e) {
-		return {cursor: a, points: b, width: c, height: d, increment: e};
-	});
 var _user$project$Main$ClearScreen = {ctor: 'ClearScreen'};
 var _user$project$Main$view = function (model) {
 	var newPoint = _user$project$Main$point(model.increment);

@@ -8210,7 +8210,7 @@ var PS = {};
           if (Data_Boolean.otherwise) {
               return false;
           };
-          throw new Error("Failed pattern match at Main line 108, column 1 - line 113, column 22: " + [ v.constructor.name, v1.constructor.name ]);
+          throw new Error("Failed pattern match at Main line 110, column 1 - line 115, column 22: " + [ v.constructor.name, v1.constructor.name ]);
       };
   };
   var isElmPortSafeSum = function (dictFail) {
@@ -8235,7 +8235,9 @@ var PS = {};
   var isElmPortSafeArrays = function (dictIsElmPortSafe) {
       return IsElmPortSafe;
   };
-  var isElmPortSafeArrayCoords = IsElmPortSafe;
+  var isElmPortSafeArray = function (dictIsElmPortSafe) {
+      return IsElmPortSafe;
+  };
   var isElmPortSafeArgument = function (dictIsElmPortSafe) {
       return IsElmPortSafe;
   };
@@ -8282,69 +8284,69 @@ var PS = {};
           var points$prime = Data_Array.insert(ordCoords)(v.etchSketch.cursor)(v.etchSketch.points);
           var cursor$prime = (function () {
               if (direction instanceof Up) {
-                  var $85 = {};
-                  for (var $86 in v.etchSketch.cursor) {
-                      if ({}.hasOwnProperty.call(v.etchSketch.cursor, $86)) {
-                          $85[$86] = v["etchSketch"]["cursor"][$86];
+                  var $86 = {};
+                  for (var $87 in v.etchSketch.cursor) {
+                      if ({}.hasOwnProperty.call(v.etchSketch.cursor, $87)) {
+                          $86[$87] = v["etchSketch"]["cursor"][$87];
                       };
                   };
-                  $85.y = v.etchSketch.cursor.y - 1 | 0;
-                  return $85;
+                  $86.y = v.etchSketch.cursor.y - 1 | 0;
+                  return $86;
               };
               if (direction instanceof Down) {
-                  var $88 = {};
-                  for (var $89 in v.etchSketch.cursor) {
-                      if ({}.hasOwnProperty.call(v.etchSketch.cursor, $89)) {
-                          $88[$89] = v["etchSketch"]["cursor"][$89];
+                  var $89 = {};
+                  for (var $90 in v.etchSketch.cursor) {
+                      if ({}.hasOwnProperty.call(v.etchSketch.cursor, $90)) {
+                          $89[$90] = v["etchSketch"]["cursor"][$90];
                       };
                   };
-                  $88.y = v.etchSketch.cursor.y + 1 | 0;
-                  return $88;
+                  $89.y = v.etchSketch.cursor.y + 1 | 0;
+                  return $89;
               };
               if (direction instanceof Left) {
-                  var $91 = {};
-                  for (var $92 in v.etchSketch.cursor) {
-                      if ({}.hasOwnProperty.call(v.etchSketch.cursor, $92)) {
-                          $91[$92] = v["etchSketch"]["cursor"][$92];
+                  var $92 = {};
+                  for (var $93 in v.etchSketch.cursor) {
+                      if ({}.hasOwnProperty.call(v.etchSketch.cursor, $93)) {
+                          $92[$93] = v["etchSketch"]["cursor"][$93];
                       };
                   };
-                  $91.x = v.etchSketch.cursor.x - 1 | 0;
-                  return $91;
+                  $92.x = v.etchSketch.cursor.x - 1 | 0;
+                  return $92;
               };
               if (direction instanceof Right) {
-                  var $94 = {};
-                  for (var $95 in v.etchSketch.cursor) {
-                      if ({}.hasOwnProperty.call(v.etchSketch.cursor, $95)) {
-                          $94[$95] = v["etchSketch"]["cursor"][$95];
+                  var $95 = {};
+                  for (var $96 in v.etchSketch.cursor) {
+                      if ({}.hasOwnProperty.call(v.etchSketch.cursor, $96)) {
+                          $95[$96] = v["etchSketch"]["cursor"][$96];
                       };
                   };
-                  $94.x = v.etchSketch.cursor.x + 1 | 0;
-                  return $94;
+                  $95.x = v.etchSketch.cursor.x + 1 | 0;
+                  return $95;
               };
-              throw new Error("Failed pattern match at Main line 122, column 15 - line 126, column 43: " + [ direction.constructor.name ]);
+              throw new Error("Failed pattern match at Main line 124, column 15 - line 128, column 43: " + [ direction.constructor.name ]);
           })();
-          var $97 = isInvalidPoint(v)(cursor$prime);
-          if ($97) {
+          var $98 = isInvalidPoint(v)(cursor$prime);
+          if ($98) {
               return v;
           };
-          var $101 = {};
-          for (var $102 in v) {
-              if ({}.hasOwnProperty.call(v, $102)) {
-                  $101[$102] = v[$102];
+          var $102 = {};
+          for (var $103 in v) {
+              if ({}.hasOwnProperty.call(v, $103)) {
+                  $102[$103] = v[$103];
               };
           };
-          $101.etchSketch = (function () {
-              var $98 = {};
-              for (var $99 in v.etchSketch) {
-                  if ({}.hasOwnProperty.call(v.etchSketch, $99)) {
-                      $98[$99] = v["etchSketch"][$99];
+          $102.etchSketch = (function () {
+              var $99 = {};
+              for (var $100 in v.etchSketch) {
+                  if ({}.hasOwnProperty.call(v.etchSketch, $100)) {
+                      $99[$100] = v["etchSketch"][$100];
                   };
               };
-              $98.cursor = cursor$prime;
-              $98.points = points$prime;
-              return $98;
+              $99.cursor = cursor$prime;
+              $99.points = points$prime;
+              return $99;
           })();
-          return $101;
+          return $102;
       };
   };
   var ui = (function () {
@@ -8364,8 +8366,8 @@ var PS = {};
               increment: 10
           }
       };
-      var error$prime = function ($136) {
-          return Control_Monad_Aff_Class.liftAff(Halogen_Query_HalogenM.monadAffHalogenM(Control_Monad_Aff_Class.monadAffAff))(Control_Monad_Aff_Console.error($136));
+      var error$prime = function ($137) {
+          return Control_Monad_Aff_Class.liftAff(Halogen_Query_HalogenM.monadAffHalogenM(Control_Monad_Aff_Class.monadAffAff))(Control_Monad_Aff_Console.error($137));
       };
       var $$eval = function (v) {
           if (v instanceof Init) {
@@ -8373,18 +8375,18 @@ var PS = {};
                   return Control_Bind.discard(Control_Bind.discardUnit)(Halogen_Query_HalogenM.bindHalogenM)((function () {
                       if (v1 instanceof Data_Maybe.Just) {
                           return Control_Bind.bind(Halogen_Query_HalogenM.bindHalogenM)(Control_Monad_Eff_Class.liftEff(Halogen_Query_HalogenM.monadEffHalogenM(Control_Monad_Aff.monadEffAff))($foreign.getElmInstance(v1.value0)))(function (v2) {
-                              return Control_Bind.discard(Control_Bind.discardUnit)(Halogen_Query_HalogenM.bindHalogenM)(Halogen_Query_HalogenM.subscribe(Halogen_Query_EventSource.eventSource(Control_Monad_Aff_Class.monadAffAff)($foreign.subscribeToClearScreen_(v2))(function ($137) {
-                                  return Data_Maybe.Just.create(Halogen_Query.request(ClearScreen.create($137)));
+                              return Control_Bind.discard(Control_Bind.discardUnit)(Halogen_Query_HalogenM.bindHalogenM)(Halogen_Query_HalogenM.subscribe(Halogen_Query_EventSource.eventSource(Control_Monad_Aff_Class.monadAffAff)($foreign.subscribeToClearScreen_(v2))(function ($138) {
+                                  return Data_Maybe.Just.create(Halogen_Query.request(ClearScreen.create($138)));
                               })))(function () {
                                   return Control_Monad_State_Class.modify(Halogen_Query_HalogenM.monadStateHalogenM)(function (v3) {
-                                      var $112 = {};
-                                      for (var $113 in v3) {
-                                          if ({}.hasOwnProperty.call(v3, $113)) {
-                                              $112[$113] = v3[$113];
+                                      var $113 = {};
+                                      for (var $114 in v3) {
+                                          if ({}.hasOwnProperty.call(v3, $114)) {
+                                              $113[$114] = v3[$114];
                                           };
                                       };
-                                      $112.elmInstance = new Data_Maybe.Just(v2);
-                                      return $112;
+                                      $113.elmInstance = new Data_Maybe.Just(v2);
+                                      return $113;
                                   });
                               });
                           });
@@ -8392,7 +8394,7 @@ var PS = {};
                       if (v1 instanceof Data_Maybe.Nothing) {
                           return error$prime("Couldn't get root instance");
                       };
-                      throw new Error("Failed pattern match at Main line 180, column 7 - line 188, column 7: " + [ v1.constructor.name ]);
+                      throw new Error("Failed pattern match at Main line 182, column 7 - line 190, column 7: " + [ v1.constructor.name ]);
                   })())(function () {
                       return $$eval(new UpdateElm(v.value0));
                   });
@@ -8405,23 +8407,23 @@ var PS = {};
           };
           if (v instanceof ClearScreen) {
               return Control_Bind.discard(Control_Bind.discardUnit)(Halogen_Query_HalogenM.bindHalogenM)(Control_Monad_State_Class.modify(Halogen_Query_HalogenM.monadStateHalogenM)(function (v1) {
-                  var $122 = {};
-                  for (var $123 in v1) {
-                      if ({}.hasOwnProperty.call(v1, $123)) {
-                          $122[$123] = v1[$123];
+                  var $123 = {};
+                  for (var $124 in v1) {
+                      if ({}.hasOwnProperty.call(v1, $124)) {
+                          $123[$124] = v1[$124];
                       };
                   };
-                  $122.etchSketch = (function () {
-                      var $119 = {};
-                      for (var $120 in v1.etchSketch) {
-                          if ({}.hasOwnProperty.call(v1.etchSketch, $120)) {
-                              $119[$120] = v1["etchSketch"][$120];
+                  $123.etchSketch = (function () {
+                      var $120 = {};
+                      for (var $121 in v1.etchSketch) {
+                          if ({}.hasOwnProperty.call(v1.etchSketch, $121)) {
+                              $120[$121] = v1["etchSketch"][$121];
                           };
                       };
-                      $119.points = Data_Monoid.mempty(Data_Monoid.monoidArray);
-                      return $119;
+                      $120.points = Data_Monoid.mempty(Data_Monoid.monoidArray);
+                      return $120;
                   })();
-                  return $122;
+                  return $123;
               }))(function () {
                   return Control_Bind.bind(Halogen_Query_HalogenM.bindHalogenM)($$eval(new UpdateElm(v.value1)))(function (v1) {
                       return Control_Applicative.pure(Halogen_Query_HalogenM.applicativeHalogenM)(v.value1(Halogen_Query_EventSource.Listening.value));
@@ -8433,19 +8435,19 @@ var PS = {};
                   return Control_Bind.discard(Control_Bind.discardUnit)(Halogen_Query_HalogenM.bindHalogenM)((function () {
                       if (v1.elmInstance instanceof Data_Maybe.Just) {
                           return Control_Bind.discard(Control_Bind.discardUnit)(Halogen_Query_HalogenM.bindHalogenM)(Control_Applicative.pure(Halogen_Query_HalogenM.applicativeHalogenM)(Data_Unit.unit))(function () {
-                              return Control_Monad_Eff_Class.liftEff(Halogen_Query_HalogenM.monadEffHalogenM(Control_Monad_Aff.monadEffAff))($foreign.sendModelUpdate(v1.elmInstance.value0)(toElmModel(genericEtchSketch)(isElmPortSafeConstructor(isElmPortSafeRec(isElmPortSafeProductFields(isElmPortSafeCoords)(isElmPortSafeProductFields(isElmPortSafeInt)(isElmPortSafeProductFields(isElmPortSafeInt)(isElmPortSafeProductFields(isElmPortSafeArrayCoords)(isElmPortSafeField(isElmPortSafeInt))))))))(v1.etchSketch)));
+                              return Control_Monad_Eff_Class.liftEff(Halogen_Query_HalogenM.monadEffHalogenM(Control_Monad_Aff.monadEffAff))($foreign.sendModelUpdate(v1.elmInstance.value0)(toElmModel(genericEtchSketch)(isElmPortSafeConstructor(isElmPortSafeRec(isElmPortSafeProductFields(isElmPortSafeCoords)(isElmPortSafeProductFields(isElmPortSafeInt)(isElmPortSafeProductFields(isElmPortSafeInt)(isElmPortSafeProductFields(isElmPortSafeArray(isElmPortSafeCoords))(isElmPortSafeField(isElmPortSafeInt))))))))(v1.etchSketch)));
                           });
                       };
                       if (v1.elmInstance instanceof Data_Maybe.Nothing) {
                           return Control_Applicative.pure(Halogen_Query_HalogenM.applicativeHalogenM)(Data_Unit.unit);
                       };
-                      throw new Error("Failed pattern match at Main line 201, column 7 - line 207, column 20: " + [ v1.elmInstance.constructor.name ]);
+                      throw new Error("Failed pattern match at Main line 203, column 7 - line 209, column 20: " + [ v1.elmInstance.constructor.name ]);
                   })())(function () {
                       return Control_Applicative.pure(Halogen_Query_HalogenM.applicativeHalogenM)(v.value0);
                   });
               });
           };
-          throw new Error("Failed pattern match at Main line 178, column 5 - line 188, column 28: " + [ v.constructor.name ]);
+          throw new Error("Failed pattern match at Main line 180, column 5 - line 190, column 28: " + [ v.constructor.name ]);
       };
       return Halogen_Component.lifecycleComponent(Halogen_HTML_Core.bifunctorHTML)({
           initialState: Data_Function["const"](initialState), 
@@ -8473,7 +8475,7 @@ var PS = {};
           if (Data_Boolean.otherwise) {
               return Data_Maybe.Nothing.value;
           };
-          throw new Error("Failed pattern match at Main line 217, column 5 - line 222, column 28: " + [ set.constructor.name ]);
+          throw new Error("Failed pattern match at Main line 219, column 5 - line 224, column 28: " + [ set.constructor.name ]);
       };
       return Data_Functor.map(FRP_Behavior.functorBehavior)(toDirection)(FRP_Behavior_Keyboard.keys);
   })();
@@ -8486,7 +8488,7 @@ var PS = {};
               if (v2 instanceof Data_Maybe.Nothing) {
                   return Control_Applicative.pure(Control_Monad_Eff.applicativeEff)(Data_Unit.unit);
               };
-              throw new Error("Failed pattern match at Main line 239, column 5 - line 243, column 27: " + [ v2.constructor.name ]);
+              throw new Error("Failed pattern match at Main line 241, column 5 - line 245, column 27: " + [ v2.constructor.name ]);
           })))(function (v2) {
               return Control_Monad_Aff_Console.log("Running");
           });
@@ -8517,10 +8519,10 @@ var PS = {};
   exports["isElmPortSafeProductFields"] = isElmPortSafeProductFields;
   exports["isElmPortSafeField"] = isElmPortSafeField;
   exports["isElmPortSafeInt"] = isElmPortSafeInt;
+  exports["isElmPortSafeArray"] = isElmPortSafeArray;
   exports["isElmPortSafeSum"] = isElmPortSafeSum;
   exports["genericCoords"] = genericCoords;
   exports["isElmPortSafeCoords"] = isElmPortSafeCoords;
-  exports["isElmPortSafeArrayCoords"] = isElmPortSafeArrayCoords;
   exports["eqCoords"] = eqCoords;
   exports["ordCoords"] = ordCoords;
   exports["genericEtchSketch"] = genericEtchSketch;

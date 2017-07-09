@@ -10,10 +10,11 @@ import Control.Monad.Eff.Exception (EXCEPTION)
 import Control.Monad.Eff.Ref (REF)
 import DOM (DOM)
 import DOM.HTML.Types (HTMLElement)
-import Data.Array (fromFoldable)
+import Data.Array (insert)
+import Data.Generic.Rep (class Generic, Argument, Constructor, Field, Product, Rec, Sum)
 import Data.Maybe (Maybe(..))
 import Data.Monoid (mempty)
-import Data.Set (Set, insert, member)
+import Data.Set (member)
 import FRP (FRP)
 import FRP.Behavior (Behavior, animate)
 import FRP.Behavior.Keyboard (keys)
@@ -23,6 +24,40 @@ import Halogen.HTML as HH
 import Halogen.HTML.Properties as HP
 import Halogen.Query.EventSource as ES
 import Halogen.VDom.Driver as D
+
+toElmModel :: forall a rep
+  . Generic a rep
+  => IsElmPortSafe rep
+  => a
+  -> a
+toElmModel = id
+
+-- type class to check if the data type is elm port compatible
+class IsElmPortSafe rep
+instance isElmPortSafeConstructor ::
+  ( IsElmPortSafe arg
+  ) => IsElmPortSafe (Constructor name arg)
+instance isElmPortSafeArrays ::
+  ( IsElmPortSafe inner
+  ) => IsElmPortSafe (Constructor "Array" inner)
+instance isElmPortSafeArgument ::
+  ( IsElmPortSafe inner
+  ) => IsElmPortSafe (Argument inner)
+instance isElmPortSafeRec ::
+  ( IsElmPortSafe fields
+  ) => IsElmPortSafe (Rec fields)
+instance isElmPortSafeProductFields ::
+  ( IsElmPortSafe inner
+  , IsElmPortSafe fields
+  ) => IsElmPortSafe (Product (Field name inner) fields)
+instance isElmPortSafeField ::
+  ( IsElmPortSafe inner
+  ) => IsElmPortSafe (Field name inner)
+instance isElmPortSafeInt ::
+  IsElmPortSafe Int
+instance isElmPortSafeSum ::
+  ( Fail "Sums do not work in ports"
+  ) => IsElmPortSafe (Sum a b)
 
 foreign import data ElmInstance :: Type
 foreign import getElmInstance :: forall eff.
@@ -37,51 +72,40 @@ foreign import sendModelUpdate :: forall eff.
   -> ElmModel
   -> Eff eff Unit
 
-type ElmCoords =
+data Direction
+  = Up
+  | Down
+  | Left
+  | Right
+
+newtype Coords = Coords
   { x :: Int
   , y :: Int
   }
-
-type ElmModel =
-  { cursor :: ElmCoords
-  , points :: Array ElmCoords
-  , width :: Int
-  , height :: Int
-  , increment :: Int
-  }
-
-stateToElmModel :: State -> ElmModel
-stateToElmModel state =
-  { cursor: coordsToElmCoords state.cursor
-  , points: coordsToElmCoords <$> fromFoldable state.points
-  , width: state.width
-  , height: state.height
-  , increment: state.increment
-  }
-  where
-    coordsToElmCoords (Coords x y) = { x, y }
-
-data Direction
-  = KUp
-  | KDown
-  | KLeft
-  | KRight
-
-data Coords = Coords Int Int
+derive instance genericCoords :: Generic Coords _
+instance isElmPortSafeCoords :: IsElmPortSafe Coords
+instance isElmPortSafeArrayCoords :: IsElmPortSafe (Array Coords)
 derive instance eqCoords :: Eq Coords
 derive instance ordCoords :: Ord Coords
 
-type State =
-  { elmInstance :: Maybe ElmInstance
-  , cursor :: Coords
-  , points :: Set Coords
+newtype ElmModel = ElmModel EtchSketch
+derive instance genericEtchSketch :: Generic ElmModel _
+
+type EtchSketch =
+  { cursor :: Coords
+  , points :: Array Coords
   , height :: Int
   , width :: Int
   , increment :: Int
   }
 
+type State =
+  { elmInstance :: Maybe ElmInstance
+  , etchSketch :: EtchSketch
+  }
+
 isInvalidPoint :: State -> Coords -> Boolean
-isInvalidPoint {increment, width, height} (Coords x y)
+isInvalidPoint {etchSketch: {increment, width, height}} (Coords {x, y})
   | x < 0 = true
   | y < 0 = true
   | x > width / increment - 1 = true
@@ -89,17 +113,17 @@ isInvalidPoint {increment, width, height} (Coords x y)
   | otherwise = false
 
 moveCursor :: Direction -> State -> State
-moveCursor direction state@{cursor: (Coords x y)} =
+moveCursor direction state@{etchSketch: {cursor: (Coords coords@{x, y})}} =
   if isInvalidPoint state cursor'
     then state
-    else state {cursor = cursor', points = points'}
+    else state {etchSketch {cursor = cursor', points = points'}}
   where
-    points' = insert state.cursor state.points
+    points' = insert state.etchSketch.cursor state.etchSketch.points
     cursor' = case direction of
-      KUp -> Coords x (y - 1)
-      KDown -> Coords x (y + 1)
-      KLeft -> Coords (x - 1) y
-      KRight -> Coords (x + 1) y
+      Up -> Coords coords {y = (y - 1)}
+      Down -> Coords coords {y = (y + 1)}
+      Left -> Coords coords {x = (x - 1)}
+      Right -> Coords coords {x = (x + 1)}
 
 data Query a
   = Init a
@@ -133,11 +157,13 @@ ui =
     initialState :: State
     initialState =
       { elmInstance: Nothing
-      , cursor: Coords 0 0
-      , points: mempty
-      , width: 800
-      , height: 600
-      , increment: 10
+      , etchSketch:
+          { cursor: Coords {x: 0, y: 0}
+          , points: mempty
+          , width: 800
+          , height: 600
+          , increment: 10
+          }
       }
 
     render :: State -> H.ComponentHTML Query
@@ -166,7 +192,7 @@ ui =
       eval (UpdateElm next)
 
     eval (ClearScreen _ reply) = do
-      H.modify _ { points = mempty :: Set Coords }
+      H.modify _ {etchSketch {points = mempty :: Array Coords}}
       _ <- eval (UpdateElm reply)
       pure (reply H.Listening)
 
@@ -174,7 +200,9 @@ ui =
       state <- H.get
       case state.elmInstance of
         Just elmInstance -> do
-          H.liftEff $ sendModelUpdate elmInstance (stateToElmModel state)
+          pure unit
+          H.liftEff $ sendModelUpdate elmInstance
+            (toElmModel $ ElmModel state.etchSketch)
         Nothing ->
           pure unit
       pure next
@@ -187,10 +215,10 @@ directions = do
   toDirection <$> keys
   where
     toDirection set
-      | member 38 set = Just KUp
-      | member 40 set = Just KDown
-      | member 37 set = Just KLeft
-      | member 39 set = Just KRight
+      | member 38 set = Just Up
+      | member 40 set = Just Down
+      | member 37 set = Just Left
+      | member 39 set = Just Right
       | otherwise = Nothing
 
 main :: forall e.

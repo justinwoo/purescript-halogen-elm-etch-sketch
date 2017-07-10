@@ -37,9 +37,6 @@ class IsElmPortSafe rep
 instance isElmPortSafeConstructor ::
   ( IsElmPortSafe arg
   ) => IsElmPortSafe (Constructor name arg)
-instance isElmPortSafeArrays ::
-  ( IsElmPortSafe inner
-  ) => IsElmPortSafe (Constructor "Array" inner)
 instance isElmPortSafeArgument ::
   ( IsElmPortSafe inner
   ) => IsElmPortSafe (Argument inner)
@@ -86,7 +83,10 @@ newtype Coords = Coords
   , y :: Int
   }
 derive instance genericCoords :: Generic Coords _
-instance isElmPortSafeCoords :: IsElmPortSafe Coords
+instance isElmPortSafeCoords ::
+  ( Generic Coords rep
+  , IsElmPortSafe rep
+  ) => IsElmPortSafe Coords
 derive instance eqCoords :: Eq Coords
 derive instance ordCoords :: Ord Coords
 

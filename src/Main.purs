@@ -11,9 +11,9 @@ import Control.Monad.Eff.Ref (REF)
 import DOM (DOM)
 import DOM.HTML.Types (HTMLElement)
 import Data.Array (insert)
-import Data.Generic.Rep (class Generic, Argument, Constructor, Field, Product, Rec, Sum)
 import Data.Maybe (Maybe(..))
 import Data.Monoid (mempty)
+import Data.Newtype (class Newtype)
 import Data.Set (member)
 import FRP (FRP)
 import FRP.Behavior (Behavior, animate)
@@ -24,40 +24,30 @@ import Halogen.HTML as HH
 import Halogen.HTML.Properties as HP
 import Halogen.Query.EventSource as ES
 import Halogen.VDom.Driver as D
+import Type.Row (class RowToList, Cons, Nil, kind RowList)
 
-toElmModel :: forall a rep
-  . Generic a rep
-  => IsElmPortSafe rep
+toElmModel :: forall a
+  . HasElmPortVersion a
   => a
   -> a
 toElmModel = id
 
--- type class to check if the data type is elm port compatible
-class IsElmPortSafe rep
-instance isElmPortSafeConstructor ::
-  ( IsElmPortSafe arg
-  ) => IsElmPortSafe (Constructor name arg)
-instance isElmPortSafeArgument ::
-  ( IsElmPortSafe inner
-  ) => IsElmPortSafe (Argument inner)
-instance isElmPortSafeRec ::
-  ( IsElmPortSafe fields
-  ) => IsElmPortSafe (Rec fields)
-instance isElmPortSafeProductFields ::
-  ( IsElmPortSafe inner
-  , IsElmPortSafe fields
-  ) => IsElmPortSafe (Product (Field name inner) fields)
-instance isElmPortSafeField ::
-  ( IsElmPortSafe inner
-  ) => IsElmPortSafe (Field name inner)
-instance isElmPortSafeInt ::
-  IsElmPortSafe Int
-instance isElmPortSafeArray ::
-  ( IsElmPortSafe inner
-  ) =>  IsElmPortSafe (Array inner)
-instance isElmPortSafeSum ::
-  ( Fail "Sums do not work in ports"
-  ) => IsElmPortSafe (Sum a b)
+class HasElmPortVersion ty
+instance hepvInt :: HasElmPortVersion Int
+instance hepvString :: HasElmPortVersion String
+instance hepvBoolean :: HasElmPortVersion Boolean
+instance hepvArray :: HasElmPortVersion inner => HasElmPortVersion (Array inner)
+instance hepvRecord ::
+  ( RowToList fields fieldList
+  , CheckElmPortVersionFields fieldList
+  ) => HasElmPortVersion (Record fields)
+
+class CheckElmPortVersionFields (xs :: RowList)
+instance cepvfCons ::
+  ( HasElmPortVersion ty
+  , CheckElmPortVersionFields tail
+  ) => CheckElmPortVersionFields (Cons name ty tail)
+instance cepvfNil :: CheckElmPortVersionFields Nil
 
 foreign import data ElmInstance :: Type
 foreign import getElmInstance :: forall eff.
@@ -69,7 +59,7 @@ foreign import subscribeToClearScreen_ :: forall eff.
   -> Eff eff Unit
 foreign import sendModelUpdate :: forall eff.
   ElmInstance
-  -> ElmModel
+  -> EtchSketch
   -> Eff eff Unit
 
 data Direction
@@ -82,16 +72,13 @@ newtype Coords = Coords
   { x :: Int
   , y :: Int
   }
-derive instance genericCoords :: Generic Coords _
-instance isElmPortSafeCoords ::
-  ( Generic Coords rep
-  , IsElmPortSafe rep
-  ) => IsElmPortSafe Coords
+derive instance ntCoords :: Newtype Coords _
+instance hepvCoords ::
+  ( Newtype Coords rec
+  , HasElmPortVersion rec
+  ) => HasElmPortVersion Coords
 derive instance eqCoords :: Eq Coords
 derive instance ordCoords :: Ord Coords
-
-newtype ElmModel = ElmModel EtchSketch
-derive instance genericEtchSketch :: Generic ElmModel _
 
 type EtchSketch =
   { cursor :: Coords
@@ -202,7 +189,7 @@ ui =
         Just elmInstance -> do
           pure unit
           H.liftEff $ sendModelUpdate elmInstance
-            (toElmModel $ ElmModel state.etchSketch)
+            (toElmModel $ state.etchSketch)
         Nothing ->
           pure unit
       pure next

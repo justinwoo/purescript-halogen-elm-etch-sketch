@@ -6,87 +6,76 @@ import Control.Monad.Aff (Canceler, launchAff)
 import Control.Monad.Aff.Console (CONSOLE, log)
 import Control.Monad.Eff (Eff)
 import Control.Monad.Eff.Exception (EXCEPTION)
-import Data.Generic.Rep (class Generic, Constructor, Field, Product, Rec)
+import Data.Foldable (intercalate)
+import Data.Newtype (class Newtype)
 import Data.Symbol (class IsSymbol, SProxy(..), reflectSymbol)
-import Main (class IsElmPortSafe, Coords, ElmModel)
+import Main (class HasElmPortVersion, Coords, EtchSketch)
 import Node.Encoding (Encoding(..))
 import Node.FS (FS)
 import Node.FS.Aff (writeTextFile)
-import Type.Equality (class TypeEquals)
 import Type.Proxy (Proxy(..))
+import Type.Row (class ListToRow, class RowToList, Cons, Nil, kind RowList)
 
-getElmRep :: forall a rep
-  . Generic a rep
-  => IsElmPortSafe rep
-  => HasElmRep rep
+getElmRep :: forall a
+  . HasElmPortVersion a
+  => HasElmTypeRep a
   => Proxy a
   -> String
-getElmRep _ = toElmRep (Proxy :: Proxy rep)
+getElmRep _ = toElmTypeRep (Proxy :: Proxy a)
 
-class HasElmRep f where
-  toElmRep :: Proxy f -> String
+class HasElmTypeRep r where
+  toElmTypeRep :: Proxy r -> String
 
-instance herConstructor ::
+instance hetrInt :: HasElmTypeRep Int where
+  toElmTypeRep _ = "Int"
+
+instance hetrArray :: HasElmTypeName inner => HasElmTypeRep (Array inner) where
+  toElmTypeRep _ = "List " <> getElmTypeName (Proxy :: Proxy inner)
+
+instance hetrCoords ::
+  ( Newtype Coords rec
+  , HasElmTypeRep rec
+  ) => HasElmTypeRep Coords where
+  toElmTypeRep _ = toElmTypeRep (Proxy :: Proxy rec)
+
+instance hetrRecord ::
+  ( HasElmTypeRepFields fieldList
+  , RowToList fields fieldList
+  ) => HasElmTypeRep (Record fields) where
+  toElmTypeRep proxy = "\n  { " <> contents <> "\n  }\n"
+    where
+      contents = intercalate "\n  , " $ extractFields proxy
+
+class HasElmTypeRepFields (xs :: RowList) where
+  extractFields :: forall fields
+    . RowToList fields xs
+    => Proxy (Record fields)
+    -> Array String
+instance hetrfCons ::
   ( IsSymbol name
-  , HasElmRep inner
-  ) => HasElmRep (Constructor name inner) where
-  toElmRep _ = "type alias " <> name <> " =" <> contents
+  , HasElmTypeName ty
+  , ListToRow tail tailRow
+  , HasElmTypeRepFields tail
+  , RowToList tailRow tail
+  ) => HasElmTypeRepFields (Cons name ty tail) where
+  extractFields _ = [name <> " : " <> tyName] <>
+    extractFields (Proxy :: Proxy (Record tailRow))
     where
       name = reflectSymbol (SProxy :: SProxy name)
-      contents = toElmRep (Proxy :: Proxy inner)
+      tyName = getElmTypeName (Proxy :: Proxy ty)
+instance hetrfNil :: HasElmTypeRepFields Nil where
+  extractFields _ = []
 
-instance herRec ::
-  ( HasElmRep inner
-  ) => HasElmRep (Rec inner) where
-  toElmRep _ = "\n  { " <> contents <> "\n  }\n"
-    where
-      contents = toElmRep (Proxy :: Proxy inner)
+class HasElmTypeName t where
+  getElmTypeName :: Proxy t -> String
 
-instance herProduct ::
-  ( HasElmRep a
-  , HasElmRep b
-  ) => HasElmRep (Product a b) where
-  toElmRep _ = first <> "\n  , " <> second
-    where
-      first = toElmRep (Proxy :: Proxy a)
-      second = toElmRep (Proxy :: Proxy b)
+instance hetnCoords :: HasElmTypeName Coords where
+  getElmTypeName _ = "Coords"
 
-instance herField ::
-  ( IsSymbol name
-  , ExtractName a
-  ) => HasElmRep (Field name a) where
-  toElmRep _ = name <> " : " <> prop
-    where
-      name = reflectSymbol (SProxy :: SProxy name)
-      prop = extractName (Proxy :: Proxy a)
-
-class ExtractName f where
-  extractName :: Proxy f -> String
-
-instance epInt :: ExtractName Int where
-  extractName _ = "Int"
-
-instance epArray :: ExtractName a => ExtractName (Array a) where
-  extractName _ = "List " <> extractName (Proxy :: Proxy a)
-
-instance epZZZ :: -- overlapping instance because i am a madman
-  ( Generic a rep
-  , TypeEquals rep (Constructor name b)
-  , IsSymbol name
-  ) => ExtractName a where
-  extractName _ = reflectSymbol (SProxy :: SProxy name)
-
--- this would work fine too, but it's less fun:
--- instance epCoords :: ExtractName Coords where
---   extractName _ = genericExtractConstructorName (Proxy :: Proxy Coords)
-
--- genericExtractConstructorName :: forall a rep name b
---   . Generic a rep
---   => TypeEquals rep (Constructor name b)
---   => IsSymbol name
---   => Proxy a
---   -> String
--- genericExtractConstructorName _ = reflectSymbol (SProxy :: SProxy name)
+-- too lazy to do this manually so full yolo is in order
+-- the elm compiler will throw if something's messed up here anyway
+instance hetnZZZ :: HasElmTypeRep a => HasElmTypeName a where
+  getElmTypeName = toElmTypeRep
 
 prepareContents :: String -> String
 prepareContents contents = "module EtchSketch.Types exposing (..)\n\n" <> contents
@@ -108,6 +97,8 @@ main = launchAff do
   writeTextFile UTF8 "./src/EtchSketch/Types.elm" contents
   log "done"
   where
+    elmModel = "type alias ElmModel =" <> getElmRep (Proxy :: Proxy EtchSketch)
+    coords = "type alias Coords =" <> getElmRep (Proxy :: Proxy Coords)
     contents = prepareContents $
-      getElmRep (Proxy :: Proxy Coords) <>
-        getElmRep (Proxy :: Proxy ElmModel)
+      coords <> elmModel
+      

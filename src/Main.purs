@@ -24,30 +24,8 @@ import Halogen.HTML as HH
 import Halogen.HTML.Properties as HP
 import Halogen.Query.EventSource as ES
 import Halogen.VDom.Driver as D
-import Type.Row (class RowToList, Cons, Nil, kind RowList)
-
-toElmModel :: forall a
-  . HasElmPortVersion a
-  => a
-  -> a
-toElmModel = id
-
-class HasElmPortVersion ty
-instance hepvInt :: HasElmPortVersion Int
-instance hepvString :: HasElmPortVersion String
-instance hepvBoolean :: HasElmPortVersion Boolean
-instance hepvArray :: HasElmPortVersion inner => HasElmPortVersion (Array inner)
-instance hepvRecord ::
-  ( RowToList fields fieldList
-  , CheckElmPortVersionFields fieldList
-  ) => HasElmPortVersion (Record fields)
-
-class CheckElmPortVersionFields (xs :: RowList)
-instance cepvfCons ::
-  ( HasElmPortVersion ty
-  , CheckElmPortVersionFields tail
-  ) => CheckElmPortVersionFields (Cons name ty tail)
-instance cepvfNil :: CheckElmPortVersionFields Nil
+import Kancho (class HasElmPortVersion, toElmModel)
+import Kancho.Generate (class HasElmTypeRep)
 
 foreign import data ElmInstance :: Type
 foreign import getElmInstance :: forall eff.
@@ -77,6 +55,8 @@ instance hepvCoords ::
   ( Newtype Coords rec
   , HasElmPortVersion rec
   ) => HasElmPortVersion Coords
+instance hetrCoords :: HasElmTypeRep Coords where
+  toElmTypeRep _ _ = "Coords"
 derive instance eqCoords :: Eq Coords
 derive instance ordCoords :: Ord Coords
 

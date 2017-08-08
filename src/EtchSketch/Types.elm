@@ -1,10 +1,10 @@
 module EtchSketch.Types exposing (..)
 
-type alias Coords =
+type alias Coords = 
   { x : Int
   , y : Int
   }
-type alias ElmModel =
+type alias ElmModel = 
   { cursor : Coords
   , height : Int
   , increment : Int

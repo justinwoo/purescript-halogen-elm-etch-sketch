@@ -7,3 +7,4 @@
 /.purs*
 /.psa*
 /elm-stuff
+package-lock.json

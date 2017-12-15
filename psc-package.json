@@ -1,0 +1,16 @@
+{
+    "name": "purescript-halogen-elm-etch-sketch",
+    "set": "hongshaorou",
+    "source": "https://github.com/justinwoo/package-sets.git",
+    "depends": [
+        "prelude",
+        "console",
+        "halogen",
+        "behaviors",
+        "generics-rep",
+        "profunctor-lenses",
+        "node-fs-aff",
+        "typelevel-prelude",
+        "kancho"
+    ]
+}

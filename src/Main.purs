@@ -26,7 +26,6 @@ import Halogen.HTML.Properties as HP
 import Halogen.Query.EventSource as ES
 import Halogen.VDom.Driver as D
 import Kancho (class HasElmPortVersion, toElmModel)
-import Kancho.Generate (class HasElmTypeRep)
 
 foreign import data ElmInstance :: Type
 foreign import getElmInstance :: forall eff.
@@ -52,9 +51,8 @@ newtype Coords = Coords
   , y :: Int
   }
 derive instance ntCoords :: Newtype Coords _
-derive newtype instance hepvCoords :: HasElmPortVersion Coords
-instance hetrCoords :: HasElmTypeRep Coords where
-  toElmTypeRep _ _ = "Coords"
+instance hepvCoords :: HasElmPortVersion Coords where
+  toElmTypeRep _ = "Coords"
 derive instance eqCoords :: Eq Coords
 derive instance ordCoords :: Ord Coords
 

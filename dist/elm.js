@@ -8610,8 +8610,8 @@ var _user$project$EtchSketch_Types$ElmModel = F5(
 		return {cursor: a, height: b, increment: c, points: d, width: e};
 	});
 
-var _user$project$Main$point = F3(
-	function (increment, subkey, _p0) {
+var _user$project$Main$point = F4(
+	function (increment, subkey, color, _p0) {
 		var _p1 = _p0;
 		return A2(
 			_elm_lang$svg$Svg$rect,
@@ -8631,7 +8631,11 @@ var _user$project$Main$point = F3(
 							ctor: '::',
 							_0: _elm_lang$svg$Svg_Attributes$y(
 								_elm_lang$core$Basics$toString(_p1.y * increment)),
-							_1: {ctor: '[]'}
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$svg$Svg_Attributes$fill(color),
+								_1: {ctor: '[]'}
+							}
 						}
 					}
 				}
@@ -8725,10 +8729,10 @@ var _user$project$Main$modelUpdates = _elm_lang$core$Native_Platform.incomingPor
 var _user$project$Main$ClearScreen = {ctor: 'ClearScreen'};
 var _user$project$Main$view = function (model) {
 	var newPoint = _user$project$Main$point(model.increment);
-	var cursor = A2(newPoint, 'cursor', model.cursor);
+	var cursor = A3(newPoint, 'cursor', 'red', model.cursor);
 	var points = A2(
 		_elm_lang$core$List$map,
-		newPoint('point'),
+		A2(newPoint, 'point', 'black'),
 		model.points);
 	return A2(
 		_elm_lang$html$Html$div,

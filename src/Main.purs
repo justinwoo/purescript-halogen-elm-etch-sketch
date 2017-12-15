@@ -2,10 +2,11 @@ module Main where
 
 import Prelude
 
-import Control.Monad.Aff (Aff, launchAff, liftEff')
+import Control.Monad.Aff (Aff, launchAff)
 import Control.Monad.Aff.AVar (AVAR)
 import Control.Monad.Aff.Console (CONSOLE, error, log)
 import Control.Monad.Eff (Eff)
+import Control.Monad.Eff.Class (liftEff)
 import Control.Monad.Eff.Exception (EXCEPTION)
 import Control.Monad.Eff.Ref (REF)
 import DOM (DOM)
@@ -51,12 +52,8 @@ newtype Coords = Coords
   , y :: Int
   }
 derive instance ntCoords :: Newtype Coords _
-instance hepvCoords ::
-  ( Newtype Coords rec
-  , HasElmPortVersion rec
-  ) => HasElmPortVersion Coords
-instance hetrCoords :: HasElmTypeRep Coords where
-  toElmTypeRep _ _ = "Coords"
+derive newtype instance hepvCoords :: HasElmPortVersion Coords
+derive newtype instance hetrCoords :: HasElmTypeRep Coords
 derive instance eqCoords :: Eq Coords
 derive instance ordCoords :: Ord Coords
 
@@ -202,7 +199,7 @@ main = HA.runHalogenAff do
   body <- HA.awaitBody
   io <- D.runUI ui unit body
 
-  _ <- liftEff' $ animate directions
+  _ <- liftEff $ animate directions
     case _ of
       Just a -> do
         void <<< launchAff <<< io.query $

@@ -8804,14 +8804,7 @@ var _user$project$Main$view = function (model) {
 									}
 								}
 							},
-							A2(
-								_elm_lang$core$List$append,
-								points,
-								{
-									ctor: '::',
-									_0: cursor,
-									_1: {ctor: '[]'}
-								})),
+							{ctor: '::', _0: cursor, _1: points}),
 						_1: {ctor: '[]'}
 					}),
 				_1: {ctor: '[]'}

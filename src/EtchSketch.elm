@@ -94,7 +94,8 @@ view model =
                 , SvgAttrs.height <| toString model.height
                 ]
               <|
-                List.append points [ cursor ]
+                cursor
+                    :: points
             ]
         ]
 

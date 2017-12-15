@@ -53,7 +53,8 @@ newtype Coords = Coords
   }
 derive instance ntCoords :: Newtype Coords _
 derive newtype instance hepvCoords :: HasElmPortVersion Coords
-derive newtype instance hetrCoords :: HasElmTypeRep Coords
+instance hetrCoords :: HasElmTypeRep Coords where
+  toElmTypeRep _ _ = "Coords"
 derive instance eqCoords :: Eq Coords
 derive instance ordCoords :: Ord Coords
 

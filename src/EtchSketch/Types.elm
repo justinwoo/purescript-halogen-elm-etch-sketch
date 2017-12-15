@@ -5,15 +5,9 @@ type alias Coords =
   , y : Int
   }
 type alias ElmModel = 
-  { cursor : 
-    { x : Int
-    , y : Int
-    }
+  { cursor : Coords
   , height : Int
   , increment : Int
-  , points : List 
-      { x : Int
-      , y : Int
-      }
+  , points : List Coords
   , width : Int
   }

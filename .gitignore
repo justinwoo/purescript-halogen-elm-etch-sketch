@@ -7,5 +7,4 @@
 /.purs*
 /.psa*
 /elm-stuff
-/dist
 package-lock.json

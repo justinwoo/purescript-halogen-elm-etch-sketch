@@ -8804,7 +8804,10 @@ var _user$project$Main$view = function (model) {
 									}
 								}
 							},
-							{ctor: '::', _0: cursor, _1: points}),
+							A2(
+								_elm_lang$core$Basics_ops['++'],
+								points,
+								_elm_lang$core$List$singleton(cursor))),
 						_1: {ctor: '[]'}
 					}),
 				_1: {ctor: '[]'}

@@ -93,9 +93,7 @@ view model =
                     , SvgAttrs.width <| toString model.width
                     , SvgAttrs.height <| toString model.height
                     ]
-                  <|
-                    cursor
-                        :: points
+                  <| points ++ List.singleton cursor
                 ]
             ]
 

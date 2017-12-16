@@ -1,6 +1,6 @@
 {
     "name": "purescript-halogen-elm-etch-sketch",
-    "set": "hongshaorou",
+    "set": "baguette",
     "source": "https://github.com/justinwoo/package-sets.git",
     "depends": [
         "prelude",

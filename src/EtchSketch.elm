@@ -78,26 +78,26 @@ view model =
         points =
             List.map (newPoint "point" "black" Trail) model.points
     in
-    div
-        []
-        [ div
+        div
             []
-            [ button
-                [ onClick ClearScreen ]
-                [ text "Clear" ]
-            ]
-        , div
-            []
-            [ svg
-                [ style [ ( "border", "1px solid black" ) ]
-                , SvgAttrs.width <| toString model.width
-                , SvgAttrs.height <| toString model.height
+            [ div
+                []
+                [ button
+                    [ onClick ClearScreen ]
+                    [ text "Clear" ]
                 ]
-              <|
-                cursor
-                    :: points
+            , div
+                []
+                [ svg
+                    [ style [ ( "border", "1px solid black" ) ]
+                    , SvgAttrs.width <| toString model.width
+                    , SvgAttrs.height <| toString model.height
+                    ]
+                  <|
+                    cursor
+                        :: points
+                ]
             ]
-        ]
 
 
 main : Program Never ElmModel Msg

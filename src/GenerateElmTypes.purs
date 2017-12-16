@@ -5,8 +5,7 @@ import Prelude
 import Control.Monad.Aff (launchAff_)
 import Control.Monad.Aff.Console (log)
 import Data.Newtype (class Newtype)
-import Kancho (class HasElmPortVersion)
-import Kancho.Generate (class HasElmTypeRep, getElmRep)
+import Kancho (class HasElmPortVersion, getElmRep)
 import Main (Coords, EtchSketch)
 import Node.Encoding (Encoding(..))
 import Node.FS.Aff (writeTextFile)
@@ -28,6 +27,5 @@ main = launchAff_ do
     coordsRecProxy :: forall rec
        . Newtype Coords rec
       => HasElmPortVersion rec
-      => HasElmTypeRep rec
       => Proxy rec
     coordsRecProxy = Proxy

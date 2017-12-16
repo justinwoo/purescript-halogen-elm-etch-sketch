@@ -19,6 +19,11 @@ type Msg
     | ClearScreen
 
 
+type Block
+    = Cursor
+    | Trail
+
+
 init : ElmModel
 init =
     { cursor = Coords 0 0
@@ -39,14 +44,24 @@ update msg model =
             ( model, clearScreen () )
 
 
-point : Int -> String -> String -> Coords -> Html Msg
-point increment subkey color { x, y } =
+point : Int -> String -> String -> Block -> Coords -> Html Msg
+point increment subkey color block { x, y } =
+    let
+        opacity =
+            case block of
+                Cursor ->
+                    "1"
+
+                Trail ->
+                    "0.3"
+    in
     rect
         [ SvgAttrs.width <| toString increment
         , SvgAttrs.height <| toString increment
         , SvgAttrs.x <| toString <| x * increment
         , SvgAttrs.y <| toString <| y * increment
         , SvgAttrs.fill <| color
+        , SvgAttrs.fillOpacity <| opacity
         ]
         []
 
@@ -58,10 +73,10 @@ view model =
             point model.increment
 
         cursor =
-            newPoint "cursor" "red" model.cursor
+            newPoint "cursor" "red" Cursor model.cursor
 
         points =
-            List.map (newPoint "point" "black") model.points
+            List.map (newPoint "point" "black" Trail) model.points
     in
         div
             []

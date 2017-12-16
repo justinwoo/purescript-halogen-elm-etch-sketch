@@ -8610,9 +8610,17 @@ var _user$project$EtchSketch_Types$ElmModel = F5(
 		return {cursor: a, height: b, increment: c, points: d, width: e};
 	});
 
-var _user$project$Main$point = F4(
-	function (increment, subkey, color, _p0) {
+var _user$project$Main$point = F5(
+	function (increment, subkey, color, block, _p0) {
 		var _p1 = _p0;
+		var opacity = function () {
+			var _p2 = block;
+			if (_p2.ctor === 'Cursor') {
+				return '1';
+			} else {
+				return '0.3';
+			}
+		}();
 		return A2(
 			_elm_lang$svg$Svg$rect,
 			{
@@ -8634,7 +8642,11 @@ var _user$project$Main$point = F4(
 							_1: {
 								ctor: '::',
 								_0: _elm_lang$svg$Svg_Attributes$fill(color),
-								_1: {ctor: '[]'}
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$svg$Svg_Attributes$fillOpacity(opacity),
+									_1: {ctor: '[]'}
+								}
 							}
 						}
 					}
@@ -8656,9 +8668,9 @@ var _user$project$Main$clearScreen = _elm_lang$core$Native_Platform.outgoingPort
 	});
 var _user$project$Main$update = F2(
 	function (msg, model) {
-		var _p2 = msg;
-		if (_p2.ctor === 'UpdateModel') {
-			return {ctor: '_Tuple2', _0: _p2._0, _1: _elm_lang$core$Platform_Cmd$none};
+		var _p3 = msg;
+		if (_p3.ctor === 'UpdateModel') {
+			return {ctor: '_Tuple2', _0: _p3._0, _1: _elm_lang$core$Platform_Cmd$none};
 		} else {
 			return {
 				ctor: '_Tuple2',
@@ -8727,12 +8739,17 @@ var _user$project$Main$modelUpdates = _elm_lang$core$Native_Platform.incomingPor
 				},
 				A2(_elm_lang$core$Json_Decode$field, 'x', _elm_lang$core$Json_Decode$int)))));
 var _user$project$Main$ClearScreen = {ctor: 'ClearScreen'};
+var _user$project$Main$UpdateModel = function (a) {
+	return {ctor: 'UpdateModel', _0: a};
+};
+var _user$project$Main$Trail = {ctor: 'Trail'};
+var _user$project$Main$Cursor = {ctor: 'Cursor'};
 var _user$project$Main$view = function (model) {
 	var newPoint = _user$project$Main$point(model.increment);
-	var cursor = A3(newPoint, 'cursor', 'red', model.cursor);
+	var cursor = A4(newPoint, 'cursor', 'red', _user$project$Main$Cursor, model.cursor);
 	var points = A2(
 		_elm_lang$core$List$map,
-		A2(newPoint, 'point', 'black'),
+		A3(newPoint, 'point', 'black', _user$project$Main$Trail),
 		model.points);
 	return A2(
 		_elm_lang$html$Html$div,
@@ -8794,15 +8811,12 @@ var _user$project$Main$view = function (model) {
 			}
 		});
 };
-var _user$project$Main$UpdateModel = function (a) {
-	return {ctor: 'UpdateModel', _0: a};
-};
 var _user$project$Main$main = _elm_lang$html$Html$program(
 	{
 		init: {ctor: '_Tuple2', _0: _user$project$Main$init, _1: _elm_lang$core$Platform_Cmd$none},
 		update: _user$project$Main$update,
 		view: _user$project$Main$view,
-		subscriptions: function (_p3) {
+		subscriptions: function (_p4) {
 			return _user$project$Main$modelUpdates(_user$project$Main$UpdateModel);
 		}
 	})();

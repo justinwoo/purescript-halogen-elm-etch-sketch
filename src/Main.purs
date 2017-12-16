@@ -46,6 +46,10 @@ data Direction
   | Down
   | Left
   | Right
+  | UpRight
+  | UpLeft
+  | DownRight
+  | DownLeft
 
 newtype Coords = Coords
   { x :: Int
@@ -91,6 +95,11 @@ moveCursor direction state@{etchSketch: {cursor: (Coords coords@{x, y})}} =
       Down -> Coords coords {y = (y + 1)}
       Left -> Coords coords {x = (x - 1)}
       Right -> Coords coords {x = (x + 1)}
+      UpRight -> Coords coords {x = (x + 1), y = (y - 1)}
+      UpLeft -> Coords coords {x = (x - 1), y = (y - 1)}
+      DownRight -> Coords coords {x = (x + 1), y = (y + 1)}
+      DownLeft -> Coords coords {x = (x - 1), y = (y + 1)}
+
 
 data Query a
   = Init a
@@ -180,6 +189,10 @@ directions = do
   toDirection <$> keys
   where
     toDirection set
+      | member 38 set && member 39 set = Just UpRight
+      | member 38 set && member 37 set = Just UpLeft
+      | member 40 set && member 39 set = Just DownRight
+      | member 40 set && member 37 set = Just DownLeft
       | member 38 set = Just Up
       | member 40 set = Just Down
       | member 37 set = Just Left

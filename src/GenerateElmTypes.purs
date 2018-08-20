@@ -2,20 +2,20 @@ module GenerateElmTypes where
 
 import Prelude
 
-import Control.Monad.Aff (launchAff_)
-import Control.Monad.Eff (Eff)
-import Control.Monad.Aff.Console (CONSOLE, log)
+import Effect.Aff (launchAff_)
+import Effect (Effect)
+import Effect.Class.Console (log)
 import Data.Newtype (class Newtype)
 import Kancho (class HasElmPortVersion, getElmRep)
 import Main (Coords, EtchSketch)
 import Node.Encoding (Encoding(..))
-import Node.FS.Aff (FS, writeTextFile)
+import Node.FS.Aff (writeTextFile)
 import Type.Prelude (Proxy(..))
 
 prepareContents :: String -> String
 prepareContents contents = "module EtchSketch.Types exposing (..)\n\n" <> contents
 
-main :: forall t. Eff ( fs :: FS, console :: CONSOLE | t) Unit
+main :: Effect Unit
 main = launchAff_ do
   writeTextFile UTF8 path contents
   log $ "generated elm types to " <> path

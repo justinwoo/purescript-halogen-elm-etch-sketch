@@ -2,23 +2,15 @@ module Main where
 
 import Prelude
 
-import Control.Monad.Aff (Aff, launchAff)
-import Control.Monad.Aff.AVar (AVAR)
-import Control.Monad.Aff.Console (CONSOLE, error, log)
-import Control.Monad.Eff (Eff)
-import Control.Monad.Eff.Class (liftEff)
-import Control.Monad.Eff.Exception (EXCEPTION)
-import Control.Monad.Eff.Ref (REF)
-import DOM (DOM)
-import DOM.HTML.Types (HTMLElement)
 import Data.Array (insert)
 import Data.Maybe (Maybe(..))
-import Data.Monoid (mempty)
 import Data.Newtype (class Newtype)
-import Data.Set (member)
-import FRP (FRP)
-import FRP.Behavior (Behavior, animate)
-import FRP.Behavior.Keyboard (keys)
+import Effect (Effect)
+import Effect.Aff (Aff, launchAff)
+import Effect.Class (liftEffect)
+import Effect.Class.Console (error, log)
+import FRP.Event (Event, subscribe)
+import FRP.Event.Keyboard as Keyboard
 import Halogen as H
 import Halogen.Aff as HA
 import Halogen.HTML as HH
@@ -26,19 +18,12 @@ import Halogen.HTML.Properties as HP
 import Halogen.Query.EventSource as ES
 import Halogen.VDom.Driver as D
 import Kancho (class HasElmPortVersion, toElmModel)
+import Web.HTML (HTMLElement)
 
 foreign import data ElmInstance :: Type
-foreign import getElmInstance :: forall eff.
-  HTMLElement
-  -> Eff (dom :: DOM | eff) ElmInstance
-foreign import subscribeToClearScreen_ :: forall eff.
-  ElmInstance
-  -> (Unit -> Eff eff Unit)
-  -> Eff eff Unit
-foreign import sendModelUpdate :: forall eff.
-  ElmInstance
-  -> EtchSketch
-  -> Eff eff Unit
+foreign import getElmInstance :: HTMLElement -> Effect ElmInstance
+foreign import subscribeToClearScreen_ :: ElmInstance -> (Unit -> Effect Unit) -> Effect Unit
+foreign import sendModelUpdate :: ElmInstance -> EtchSketch -> Effect Unit
 
 data Direction
   = Up
@@ -105,17 +90,7 @@ data Query a
   | ClearScreen Unit (H.SubscribeStatus -> a)
   | UpdateElm a
 
-type AppEffects eff =
-  ( console :: CONSOLE
-  , dom :: DOM
-  , frp :: FRP
-  , avar :: AVAR
-  | eff
-  )
-
-type AppAff eff = Aff (AppEffects eff)
-
-ui :: forall eff. H.Component HH.HTML Query Unit Void (AppAff eff)
+ui :: H.Component HH.HTML Query Unit Void Aff
 ui =
   H.lifecycleComponent
     { initialState: const initialState
@@ -146,25 +121,25 @@ ui =
         ]
         []
 
-    eval :: Query ~> H.ComponentDSL State Query Void (AppAff eff)
+    eval :: Query ~> H.ComponentDSL State Query Void Aff
     eval (Init next) = do
       root <- H.getHTMLElementRef rootLabel
       case root of
         Just element -> do
-          elmInstance <- H.liftEff $ getElmInstance element
+          elmInstance <- H.liftEffect $ getElmInstance element
           H.subscribe $ ES.eventSource (subscribeToClearScreen_ elmInstance)
             (Just <<< H.request <<< ClearScreen)
-          H.modify _ { elmInstance = Just elmInstance }
+          H.modify_ _ { elmInstance = Just elmInstance }
         Nothing -> do
           error' "Couldn't get root instance"
       eval (UpdateElm next)
 
     eval (MoveCursor direction next) = do
-      H.modify $ moveCursor direction
+      H.modify_ $ moveCursor direction
       eval (UpdateElm next)
 
     eval (ClearScreen _ reply) = do
-      H.modify _ {etchSketch {points = mempty :: Array Coords}}
+      H.modify_ _ {etchSketch {points = mempty :: Array Coords}}
       _ <- eval (UpdateElm reply)
       pure (reply H.Listening)
 
@@ -173,7 +148,7 @@ ui =
       case state.elmInstance of
         Just elmInstance -> do
           pure unit
-          H.liftEff $ sendModelUpdate elmInstance
+          H.liftEffect $ sendModelUpdate elmInstance
             (toElmModel $ state.etchSketch)
         Nothing ->
           pure unit
@@ -182,36 +157,22 @@ ui =
     rootLabel = H.RefLabel "root"
     error' = H.liftAff <<< error
 
-directions :: Behavior (Maybe Direction)
+directions :: Event (Maybe Direction)
 directions = do
-  toDirection <$> keys
+  toDirection <$> Keyboard.down
   where
-    toDirection set
-      | member 38 set && member 39 set = Just UpRight
-      | member 38 set && member 37 set = Just UpLeft
-      | member 40 set && member 39 set = Just DownRight
-      | member 40 set && member 37 set = Just DownLeft
-      | member 38 set = Just Up
-      | member 40 set = Just Down
-      | member 37 set = Just Left
-      | member 39 set = Just Right
-      | otherwise = Nothing
+    toDirection "ArrowUp" = Just Up
+    toDirection "ArrowDown" = Just Down
+    toDirection "ArrowLeft" = Just Left
+    toDirection "ArrowRight" = Just Right
+    toDirection _ = Nothing
 
-main :: forall e.
-  Eff
-    ( AppEffects
-        ( avar :: AVAR
-        , ref :: REF
-        , exception :: EXCEPTION
-        | e
-        )
-    )
-    Unit
+main :: Effect Unit
 main = HA.runHalogenAff do
   body <- HA.awaitBody
   io <- D.runUI ui unit body
 
-  _ <- liftEff $ animate directions
+  _ <- liftEffect $ subscribe directions
     case _ of
       Just a -> do
         void <<< launchAff <<< io.query $

@@ -1,7 +1,7 @@
 {
     "name": "purescript-halogen-elm-etch-sketch",
-    "set": "baguette",
-    "source": "https://github.com/justinwoo/package-sets.git",
+    "set": "210818",
+    "source": "https://github.com/justinwoo/spacchetti.git",
     "depends": [
         "prelude",
         "console",

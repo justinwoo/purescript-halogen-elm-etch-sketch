@@ -9,7 +9,7 @@
   "scripts": {
     "build": "npm run build:generate && npm run build:elm-format && npm run build:elm && npm run build:ps",
     "build:elm-format": "elm-format src/**/*.elm --yes",
-    "build:elm": "elm-make src/EtchSketch.elm --output dist/elm.js",
+    "build:elm": "elm make src/EtchSketch.elm --output dist/elm.js",
     "build:ps": "pulp browserify -O --to dist/index.js",
     "build:generate": "pulp build -O -m GenerateElmTypes --to output/GenerateElmTypes.js && node output/GenerateElmTypes.js",
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -17,9 +17,9 @@
   "author": "",
   "license": "MIT",
   "devDependencies": {
-    "elm-format": "^0.6.1-alpha"
+    "elm-format": "^0.8.0"
   },
   "dependencies": {
-    "elm": "^0.18.0"
+    "elm": "^0.19.0-bugfix2"
   }
 }

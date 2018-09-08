@@ -1,5 +1,6 @@
 port module Main exposing (..)
 
+import Browser exposing (element)
 import EtchSketch.Types exposing (..)
 import Html exposing (Html, button, div, text)
 import Html.Attributes exposing (style)
@@ -56,10 +57,10 @@ point increment subkey color block { x, y } =
                     "0.3"
     in
     rect
-        [ SvgAttrs.width <| toString increment
-        , SvgAttrs.height <| toString increment
-        , SvgAttrs.x <| toString <| x * increment
-        , SvgAttrs.y <| toString <| y * increment
+        [ SvgAttrs.width <| String.fromInt increment
+        , SvgAttrs.height <| String.fromInt increment
+        , SvgAttrs.x <| String.fromInt <| x * increment
+        , SvgAttrs.y <| String.fromInt <| y * increment
         , SvgAttrs.fill <| color
         , SvgAttrs.fillOpacity <| opacity
         ]
@@ -89,19 +90,19 @@ view model =
             , div
                 []
                 [ svg
-                    [ style [ ( "border", "1px solid black" ) ]
-                    , SvgAttrs.width <| toString model.width
-                    , SvgAttrs.height <| toString model.height
+                    [ style "border" "1px solid black"
+                    , SvgAttrs.width <| String.fromInt model.width
+                    , SvgAttrs.height <| String.fromInt model.height
                     ]
                   <| points ++ List.singleton cursor
                 ]
             ]
 
 
-main : Program Never ElmModel Msg
+main : Program () ElmModel Msg
 main =
-    Html.program
-        { init = ( init, Cmd.none )
+    Browser.element
+        { init = \_ -> ( init, Cmd.none )
         , update = update
         , view = view
         , subscriptions = \_ -> modelUpdates UpdateModel

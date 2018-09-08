@@ -1,4 +1,4 @@
-module EtchSketch.Types exposing (..)
+module EtchSketch.Types exposing (Coords, ElmModel)
 
 
 type alias Coords =

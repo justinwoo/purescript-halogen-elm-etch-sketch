@@ -1,6 +1,6 @@
 {
     "name": "purescript-halogen-elm-etch-sketch",
-    "set": "210818",
+    "set": "080918",
     "source": "https://github.com/justinwoo/spacchetti.git",
     "depends": [
         "prelude",
